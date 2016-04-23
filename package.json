@@ -3,9 +3,17 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node node_modules/react-native/local-cli/cli.js start"
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "assemble": "cd android && gradlew assembleRelease && cd ..",
+    "install-dbg": "adb install -r android/app/build/outputs/apk/awboc-debug-1.0.apk",
+    "install-rel": "adb install -r android/app/build/outputs/apk/awboc-release-1.0.apk",
+    "bridge": "adb reverse tcp:8081 tcp:8081",
+    "menu": "adb shell input keyevent 82",
+    "logs": "adb logcat *:S ReactNative:V ReactNativeJS:V"    
   },
   "dependencies": {
+    "apsl-react-native-button": "^2.4.2",
+    "react": "^0.14.8",
     "react-native": "^0.24.1"
   }
 }
