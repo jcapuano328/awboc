@@ -13,7 +13,7 @@ var NavMenuItem = React.createClass({
             <TouchableOpacity onPress={this.onPress}>
                 <View style={{flex: 1,backgroundColor: '#fff'}}>
                     <View style={{
-                        alignItems: 'flex-start',
+                        alignItems: 'center',
                         justifyContent: 'flex-start',
                         flex: 1,
                         flexDirection: 'row',
@@ -51,8 +51,8 @@ var NavMenu = React.createClass({
                     automaticallyAdjustContentInsets={false}
                     scrollEventThrottle={200}
                     style={{backgroundColor: 'transparent',flex: 1}}>
-                    <NavMenuItem logo={'home'} name={'Home'} onPress={this.onPress} />
-                    <NavMenuItem logo={'info'} name={'About'} onPress={this.onPress}/>
+                    <NavMenuItem image={'home'} name={'Home'} onPress={this.onPress} />
+                    <NavMenuItem image={'info'} name={'About'} onPress={this.onPress}/>
                 </ScrollView>
             </View>
         );
