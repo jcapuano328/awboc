@@ -7,20 +7,39 @@ var NavMenu = require('./widgets/navMenu');
 var ListsView = require('./listsView');
 var LandingView = require('./landingView');
 var AboutView = require('./aboutView');
+var SystemStore = require('./stores/system');
+var ListsStore = require('./stores/lists');
 
 var MainView = React.createClass({
     getInitialState() {
         return {
             drawer: false,
-            current: false,
-            about: false
+            home: false,
+            about: false,
+            version: ''
         }
     },
     componentWillMount() {
-        this.fetchData();
-    },
-    fetchData() {
-        console.log('mainView: load current lists');
+        SystemStore.get()
+        .then((data) => {
+            console.log(data);
+            this.state.version = data.version;
+            if (!data.initialized) {
+                console.log('*********** initialize lists');
+                return ListsStore.initialize()
+                .then(() => {
+                    return SystemStore.update({version: this.state.version, initialized: true});
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+            }
+            return new Promise((accept,reject) => accept());
+        })
+        .then(() => {
+            this.setState({home: true});
+        })
+        .done();
     },
     toggleDrawer() {
         if (!this.state.drawer) {
@@ -41,7 +60,7 @@ var MainView = React.createClass({
             this.setState({about: true});
             //this.refs.navigator.push({name: 'about', index: 2});
         } else if (e == 'Home') {
-            //this.setState({})
+            this.setState({home: true})
             //this.refs.navigator.push({name: 'lists', index: 1});
         }
         this.toggleDrawer();
@@ -80,13 +99,26 @@ var MainView = React.createClass({
                                     <AboutView onClose={() => {this.setState({about: false});}} />
                                 );
                             }
-                            if (!this.state.current) {
+                            if (!this.state.home) {
                                 return (
                                     <LandingView onMenu={this.menuHandler} onAbout={this.aboutHandler}/>
                                 );
                             }
                             return (
-                                <ListsView onMenu={this.menuHandler} onAbout={this.aboutHandler}/>
+                                <ListsView onMenu={this.menuHandler} onAbout={this.aboutHandler}
+                                    onSelected={(e) => {
+                                        console.log('*********** selected');
+                                        console.log(e.name);
+                                    }}
+                                    onStatus={(e) => {
+                                        console.log('*********** status change');
+                                        console.log(e.name);
+                                    }}
+                                    onRemove={(e) => {
+                                        console.log('*********** remove');
+                                        console.log(e.name);
+                                    }}
+                                />
                             );
                         }}
                     />

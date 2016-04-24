@@ -9,11 +9,13 @@
     "install-rel": "adb install -r android/app/build/outputs/apk/awboc-release-1.0.apk",
     "bridge": "adb reverse tcp:8081 tcp:8081",
     "menu": "adb shell input keyevent 82",
-    "logs": "adb logcat *:S ReactNative:V ReactNativeJS:V"    
+    "logs": "adb logcat *:S ReactNative:V ReactNativeJS:V"
   },
   "dependencies": {
     "apsl-react-native-button": "^2.4.2",
+    "moment": "^2.13.0",
     "react": "^0.14.8",
-    "react-native": "^0.24.1"
+    "react-native": "^0.24.1",
+    "react-native-store": "^0.4.1"
   }
 }

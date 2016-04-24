@@ -1,0 +1,22 @@
+awboc: {
+    lists: [
+        list: {
+            name: string,
+            location: string,
+            status: string,
+            on: datetime,
+            created: datetime,
+            modified: datetime,
+            items: [
+                item: {
+                    name: string,
+                    details: string,
+                    location: string,
+                    status: string,
+                    created: datetime,
+                    modified: datetime
+                }
+            ]
+        }
+    ]
+}

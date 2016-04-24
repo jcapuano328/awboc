@@ -1,5 +1,5 @@
 module.exports = {
-	"logo": require('./logo.jpg'),
+	"logo": require('./logo.png'),
 	"splash": require('./splash.png'),
 	"menu": require('./hamburger.png'),
 	"home": require('./home.png'),
@@ -7,5 +7,11 @@ module.exports = {
 
 	"refreshButton": require('./ic_action_refresh.png'),
 	"prevButton":	require('./ic_action_previous_item.png'),
-	"nextButton": require('./ic_action_next_item.png')
+	"nextButton": require('./ic_action_next_item.png'),
+
+	"open":	require('./unchecked_checkbox.png'),
+	"complete": require('./checked_checkbox.png'),
+	"select": require('./select.jpg'),
+	"add": require('./add.jpg'),
+	"remove": require('./remove.png')
 };

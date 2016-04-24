@@ -1,0 +1,88 @@
+[
+    {
+        "name": "Grocery",
+        "location": "Kroger",
+        "status": "open",
+        "on": "2016-04-23T16:30:00Z",
+        "created": null,
+        "modified": null,
+        "items": [
+            {
+                "name": "Salad",
+                "location": "",
+                "status": "open",
+                "created": null,
+                "modified": null
+            },
+            {
+                "name": "Dog Toy",
+                "location": "",
+                "status": "open",
+                "created": null,
+                "modified": null
+            }
+        ]
+    },
+    {
+        "name": "Laundry",
+        "location": "Home",
+        "status": "open",
+        "on": "2016-04-23T03:30:00Z",
+        "created": null,
+        "modified": null,
+        "items": [
+            {
+                "name": "Clothes",
+                "location": "",
+                "status": "complete",
+                "created": null,
+                "modified": null
+            },
+            {
+                "name": "Sheets",
+                "location": "",
+                "status": "open",
+                "created": null,
+                "modified": null
+            },
+            {
+                "name": "Towels",
+                "location": "",
+                "status": "open",
+                "created": null,
+                "modified": null
+            }
+        ]
+    },
+    {
+        "name": "Shopping",
+        "location": "Out and About",
+        "status": "open",
+        "on": "2016-04-23T03:30:00Z",
+        "created": null,
+        "modified": null,
+        "items": [
+            {
+                "name": "T Shirts",
+                "location": "",
+                "status": "complete",
+                "created": null,
+                "modified": null
+            },
+            {
+                "name": "Polo Shirts",
+                "location": "",
+                "status": "open",
+                "created": null,
+                "modified": null
+            },
+            {
+                "name": "Belts",
+                "location": "",
+                "status": "open",
+                "created": null,
+                "modified": null
+            }
+        ]
+    }
+]
