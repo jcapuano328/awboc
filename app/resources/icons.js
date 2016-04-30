@@ -2,6 +2,7 @@ module.exports = {
 	"logo": require('./logo.png'),
 	"splash": require('./splash.png'),
 	"menu": require('./hamburger.png'),
+	"back": require('./ic_action_previous_item.png'),
 	"home": require('./home.png'),
 	"info": require('./info.png'),
 
@@ -13,5 +14,6 @@ module.exports = {
 	"complete": require('./checked_checkbox.png'),
 	"select": require('./select.jpg'),
 	"add": require('./add.jpg'),
+	"filter": require('./filter.png'),
 	"remove": require('./remove.png')
 };

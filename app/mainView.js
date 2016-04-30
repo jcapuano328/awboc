@@ -1,28 +1,38 @@
 'use strict';
 
 var React = require('react-native');
-var { View, Navigator } = React;
+var { View, Text, Navigator } = React;
 var DrawerLayout = require('./widgets/drawerLayout');
 var NavMenu = require('./widgets/navMenu');
+var TitleBar = require('./widgets/titleBar');
+import { MenuContext } from 'react-native-menu';
 var ListsView = require('./listsView');
 var LandingView = require('./landingView');
 var AboutView = require('./aboutView');
 var SystemStore = require('./stores/system');
 var ListsStore = require('./stores/lists');
+var title = 'Aw? Boc!';
 
 var MainView = React.createClass({
     getInitialState() {
         return {
             drawer: false,
-            home: false,
-            about: false,
+            routes: {
+                landing: {index: 0, name: 'landing', onMenu: this.navMenuHandler},
+                lists: {index: 1, name: 'lists', title: 'Lists', onMenu: this.navMenuHandler, onAdd: this.onAdd, onFilter: this.onFilter},
+                list: {index: 2, name: 'list', title: 'List', onMenu: this.navMenuHandler, onAdd: this.onAdd},
+                item: {index: 3, name: 'item', title: 'Item', onMenu: this.navMenuHandler},
+                about: {index: 4, name: 'about'}
+            },
             version: ''
         }
     },
     componentWillMount() {
+        console.log('set initial route');
+        this.state.initialRoute = this.state.routes.landing;
         SystemStore.get()
         .then((data) => {
-            console.log(data);
+            //console.log(data);
             this.state.version = data.version;
             if (!data.initialized) {
                 console.log('*********** initialize lists');
@@ -34,10 +44,10 @@ var MainView = React.createClass({
                     console.log(err);
                 });
             }
+            console.log('go to lists');
+            this.state.initialRoute = this.state.routes.lists;
+            this.refs.navigator.push(this.state.routes.lists);
             return new Promise((accept,reject) => accept());
-        })
-        .then(() => {
-            this.setState({home: true});
         })
         .done();
     },
@@ -57,26 +67,54 @@ var MainView = React.createClass({
     navMenuHandler(e) {
         console.log(e);
         if (e == 'About') {
-            this.setState({about: true});
-            //this.refs.navigator.push({name: 'about', index: 2});
+            this.refs.navigator.push(this.state.routes.about);
         } else if (e == 'Home') {
-            this.setState({home: true})
-            //this.refs.navigator.push({name: 'lists', index: 1});
+            this.refs.navigator.push(this.state.routes.lists);
         }
         this.toggleDrawer();
-
     },
-    aboutHandler() {
-        this.setState({about: true});
+    onAdd() {
+        console.log('add');
     },
-    initialRoute() {
-        if (this.state.about) {
-            return {name: 'about', index: 2};
+    onFilter(filter) {
+        console.log(filter);
+    },
+    renderScene(route, navigator) {
+        route = route || {};
+        console.log('render scene ' + route.name);
+        if (route.name == 'landing') {
+            return (
+                <LandingView />
+            );
         }
-        else if (!this.state.current) {
-            return {name: 'landing', index: 0};
+        if (route.name == 'lists') {
+            return (
+                <View style={{marginTop: 50}}>
+                    <ListsView
+                        onSelected={(e) => {
+                            console.log('*********** selected');
+                            console.log(e.name);
+                        }}
+                        onStatus={(e) => {
+                            console.log('*********** status change');
+                            console.log(e.name);
+                        }}
+                        onRemove={(e) => {
+                            console.log('*********** remove');
+                            console.log(e.name);
+                        }}
+                    />
+                </View>
+            );
         }
-        return {name: 'home', index: 1};
+        if (route.name == 'about') {
+            return (
+                <AboutView version={this.state.version} onClose={() => {navigator.pop();}} />
+            );
+        }
+        return (
+            <LandingView />
+        );
     },
     render() {
         return (
@@ -89,39 +127,15 @@ var MainView = React.createClass({
                     onDrawerStateChanged={(e) => this.setState({drawerStateChangedOutput: JSON.stringify(e)})}
                     drawerWidth={300}
                     renderNavigationView={() => <NavMenu onSelected={this.navMenuHandler} /> }>
+                    <MenuContext style={{flex: 1}}>
                     <Navigator
                         ref="navigator"
-                        initialRoute={this.initialRoute()}
-                        renderScene={(route, navigator) => {
-                            //console.log(route.name);
-                            if (this.state.about) {
-                                return (
-                                    <AboutView onClose={() => {this.setState({about: false});}} />
-                                );
-                            }
-                            if (!this.state.home) {
-                                return (
-                                    <LandingView onMenu={this.menuHandler} onAbout={this.aboutHandler}/>
-                                );
-                            }
-                            return (
-                                <ListsView onMenu={this.menuHandler} onAbout={this.aboutHandler}
-                                    onSelected={(e) => {
-                                        console.log('*********** selected');
-                                        console.log(e.name);
-                                    }}
-                                    onStatus={(e) => {
-                                        console.log('*********** status change');
-                                        console.log(e.name);
-                                    }}
-                                    onRemove={(e) => {
-                                        console.log('*********** remove');
-                                        console.log(e.name);
-                                    }}
-                                />
-                            );
-                        }}
+                        debugOverlay={false}
+                        initialRoute={this.state.initialRoute}
+                        renderScene={this.renderScene}
+                        navigationBar={<Navigator.NavigationBar routeMapper={TitleBar()} />}
                     />
+                    </MenuContext>
                 </DrawerLayout>
             </View>
         );

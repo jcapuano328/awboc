@@ -1,57 +1,59 @@
 'use strict';
 
 var React = require('react-native');
-var { ToolbarAndroid, } = React;
-var Icons = require('../resources/icons');
+var { View, Text } = React;
+var FilterMenu = require('./filterMenu');
+var IconButton = require('./iconButton');
 
-var TitleBar = React.createClass({
-    getInitialState() {
-        let state = {actions: []};
-        if (this.props.onAdd) {
-          state.actions.push({
-            title: 'Add',
-            icon: Icons.add,
-            show: 'always',
-            handler: this.props.onAdd
-          });
-        }
-        if (this.props.onFilter) {
-            state.actions.push({
-              title: 'Today',
-              handler: this.props.onFilter
-            });
-            state.actions.push({
-              title: 'Yesterday',
-              handler: this.props.onFilter
-            });
-            state.actions.push({
-              title: 'All',
-              handler: this.props.onFilter
-            });
-        }
+var renderTitle = (props) => {
+    if (typeof props.title == 'function') {
+        return props.title();
+    }
+    return props.title || '';
+}
 
-        return state;
-    },
-    onActionSelected(position) {
-        let action = this.state.actions[position];
-        if (action) {
-            action.handler && action.handler(action.title);
+var TitleBar = (props) => {
+    props = props || {};
+    return {
+        LeftButton(route, navigator, index, navState) {
+            route = route || {};
+            return (
+                <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                    <IconButton image={props.logo || 'menu'} resizeMode='stretch' onPress={route.onMenu} />
+                    {index > 0 ? <IconButton image={'back'} resizeMode='stretch' onPress={() => navigator.pop()} /> : null}
+                </View>
+            );
+        },
+        Title(route, navigator, index, navState) {
+            route = route || {};
+            //console.log(navState);
+            return (
+                <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                    <Text style={{
+                          fontSize: 28,
+                          fontWeight: 'bold',
+                          marginLeft: 10,
+                          marginVertical: 10,
+                          //color: 'blue'
+                        }}>
+                      {renderTitle(route)}
+                    </Text>
+                </View>
+            );
+        },
+        RightButton(route, navigator, index, navState) {
+            route = route || {};
+            if (!route.onAdd && !route.onFilter) {
+              return null;
+            }
+            return (
+                <View style={{flex: 1, flexDirection: 'row', marginVertical: 10}}>
+                    {route.onAdd ? <IconButton image={'add'} onPress={route.onAdd} /> : null}
+                    {route.onFilter ? <FilterMenu image={'filter'} onSelect={route.onFilter} /> : null}
+                </View>
+            );
         }
-    },
-    render() {
-        return (
-            <ToolbarAndroid
-                navIcon={Icons.logo}
-                style={this.props.barStyle || {backgroundColor: '#e9eaed',height: 64}}
-                title={this.props.title}
-                subtitle={this.props.subtitle}
-                subtitleColor={this.props.subtitleColor || 'blue'}
-                onIconClicked={this.props.onMenu}
-                actions={this.state.actions}
-                onActionSelected={this.onActionSelected}
-            />
-        );
-    },
-});
+    };
+}
 
 module.exports = TitleBar;
