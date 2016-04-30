@@ -34,10 +34,10 @@ var ListItemDetailView = React.createClass({
                     <Text>Complete</Text>
                     <Switch value={this.state.status == 'complete'} onValueChange={this.onStatusChanged} />
                 </View>
-                <Text>created {moment(this.state.created).format('MMM DD, YYYY HH:mm')}</Text>
                 <Text>modified {moment(this.state.modified).format('MMM DD, YYYY HH:mm')}</Text>
             </View>
         );
+        //<Text>created {moment(this.state.created).format('MMM DD, YYYY HH:mm')}</Text>
     }
 });
 

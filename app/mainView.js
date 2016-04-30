@@ -80,7 +80,9 @@ var MainView = React.createClass({
         if (e == 'About') {
             this.refs.navigator.push(this.state.routes.about);
         } else if (e == 'Home') {
-            this.refs.navigator.push(this.state.routes.lists);
+            this.state.selectedList = null;
+            this.state.selectedItem = null;
+            this.refs.navigator.popToRoute(this.state.routes.lists);
         }
         this.toggleDrawer();
     },
@@ -96,6 +98,7 @@ var MainView = React.createClass({
     renderScene(route, navigator) {
         route = route || {};
         console.log('render scene ' + route.name);
+        console.log(navigator.getCurrentRoutes().length);
         if (route.name == 'landing') {
             return (
                 <LandingView />

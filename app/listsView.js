@@ -34,10 +34,11 @@ var ListsView = React.createClass({
                     scrollEventThrottle={200}
                     style={{backgroundColor: 'transparent',flex: 1}}>
                     {this.props.lists.map((list, i) => {
+                        console.log('render list ' + i);
                         return (
-                            <ListsItemView key={i} list={list} onSelected={this.onSelected(list)} onStatus={this.onStatus(list)} onRemove={this.onRemove(list)}/>
+                            <ListsItemView key={list.name + i} list={list} onSelected={this.onSelected(list)} onStatus={this.onStatus(list)} onRemove={this.onRemove(list)}/>
                         );
-                    })}
+                    })}                    
                 </ScrollView>
             </View>
         );
