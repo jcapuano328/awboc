@@ -6,7 +6,7 @@ var IconButton = require('./iconButton');
 var Icons = require('../resources/icons');
 var moment = require('moment');
 
-var ListView = React.createClass({
+var ListsItemView = React.createClass({
     render() {
         let list = this.props.list;
         return (
@@ -24,7 +24,6 @@ var ListView = React.createClass({
                 borderWidth: 1,
                 borderRadius: 10
             }}>
-                <IconButton image={list.status} onPress={this.props.onStatus}/>
                 <TouchableOpacity style={{flex: 2}} onPress={this.props.onSelected}>
                     <View style={{flex: 1}}>
                         <Text style={{fontSize: 24, fontWeight: 'bold', textAlign: 'left',marginLeft: 20}}>{list.name}</Text>
@@ -38,4 +37,4 @@ var ListView = React.createClass({
     }
 });
 
-module.exports = ListView;
+module.exports = ListsItemView;

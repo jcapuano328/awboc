@@ -6,8 +6,10 @@ var DrawerLayout = require('./widgets/drawerLayout');
 var NavMenu = require('./widgets/navMenu');
 var TitleBar = require('./widgets/titleBar');
 import { MenuContext } from 'react-native-menu';
-var ListsView = require('./listsView');
 var LandingView = require('./landingView');
+var ListsView = require('./listsView');
+var ListView = require('./listView');
+var ListItemDetailView = require('./listItemDetailView');
 var AboutView = require('./aboutView');
 var SystemStore = require('./stores/system');
 var ListsStore = require('./stores/lists');
@@ -24,7 +26,8 @@ var MainView = React.createClass({
                 item: {index: 3, name: 'item', title: 'Item', onMenu: this.navMenuHandler},
                 about: {index: 4, name: 'about'}
             },
-            version: ''
+            version: '',
+            lists: []
         }
     },
     componentWillMount() {
@@ -48,6 +51,14 @@ var MainView = React.createClass({
             this.state.initialRoute = this.state.routes.lists;
             this.refs.navigator.push(this.state.routes.lists);
             return new Promise((accept,reject) => accept());
+        })
+        .then(() => {
+            return ListsStore.select();
+        })
+        .then((data) => {
+            console.log('*********** lists');
+            //console.log(data);
+            this.setState({lists: data || []});
         })
         .done();
     },
@@ -79,6 +90,9 @@ var MainView = React.createClass({
     onFilter(filter) {
         console.log(filter);
     },
+    onSelected(type, item) {
+
+    },
     renderScene(route, navigator) {
         route = route || {};
         console.log('render scene ' + route.name);
@@ -90,10 +104,13 @@ var MainView = React.createClass({
         if (route.name == 'lists') {
             return (
                 <View style={{marginTop: 50}}>
-                    <ListsView
+                    <ListsView lists={this.state.lists}
                         onSelected={(e) => {
                             console.log('*********** selected');
                             console.log(e.name);
+                            this.state.selectedList = e;
+                            this.state.routes.list.title = e.name;
+                            navigator.push(this.state.routes.list);
                         }}
                         onStatus={(e) => {
                             console.log('*********** status change');
@@ -107,6 +124,48 @@ var MainView = React.createClass({
                 </View>
             );
         }
+
+        if (route.name == 'list') {
+            return (
+                <View style={{marginTop: 50}}>
+                    <ListView list={this.state.selectedList}
+                        onSelected={(e) => {
+                            console.log('*********** selected');
+                            console.log(e.name);
+                            this.state.selectedItem = e;
+                            this.state.routes.item.title = e.name;
+                            navigator.push(this.state.routes.item);
+                        }}
+                        onStatus={(e) => {
+                            console.log('*********** status change');
+                            console.log(e.name);
+                        }}
+                        onRemove={(e) => {
+                            console.log('*********** remove');
+                            console.log(e.name);
+                        }}
+                    />
+                </View>
+            );
+        }
+
+        if (route.name == 'item') {
+            return (
+                <View style={{marginTop: 50}}>
+                    <ListItemDetailView item={this.state.selectedItem}
+                        onOk={(e) => {
+                            console.log('*********** accept changes');
+                            console.log(e.name);
+                        }}
+                        onCancel={(e) => {
+                            console.log('*********** discard changes');
+                            console.log(e.name);
+                        }}
+                    />
+                </View>
+            );
+        }
+
         if (route.name == 'about') {
             return (
                 <AboutView version={this.state.version} onClose={() => {navigator.pop();}} />

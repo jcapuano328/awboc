@@ -3,26 +3,27 @@
 var React = require('react-native');
 var { View, ScrollView, Text } = React;
 var Icons = require('./resources/icons');
-var ListsItemView = require('./widgets/listsItemView');
+var ListItemView = require('./widgets/listItemView');
 
-var ListsView = React.createClass({
-    onSelected(list) {
+var ListView = React.createClass({
+    onSelected(item) {
         return () => {
-            this.props.onSelected && this.props.onSelected(list);
+            this.props.onSelected && this.props.onSelected(item);
         }
     },
-    onStatus(list) {
+    onStatus(item) {
         return () => {
-            this.props.onStatus && this.props.onStatus(list);
+            this.props.onStatus && this.props.onStatus(item);
         }
     },
-    onRemove(list) {
+    onRemove(item) {
         return () => {
-            this.props.onRemove && this.props.onRemove(list);
+            this.props.onRemove && this.props.onRemove(item);
         }
     },
     render() {
-        console.log('render lists');
+        console.log('render list');        
+        let items = this.props.list.items;
         return (
             <View style={{
                 flex: 1,
@@ -33,9 +34,9 @@ var ListsView = React.createClass({
                     automaticallyAdjustContentInsets={false}
                     scrollEventThrottle={200}
                     style={{backgroundColor: 'transparent',flex: 1}}>
-                    {this.props.lists.map((list, i) => {
+                    {items.map((item, i) => {
                         return (
-                            <ListsItemView key={i} list={list} onSelected={this.onSelected(list)} onStatus={this.onStatus(list)} onRemove={this.onRemove(list)}/>
+                            <ListItemView key={i} item={item} onSelected={this.onSelected(item)} onStatus={this.onStatus(item)} onRemove={this.onRemove(item)}/>
                         );
                     })}
                 </ScrollView>
@@ -44,4 +45,4 @@ var ListsView = React.createClass({
     }
 });
 
-module.exports = ListsView;
+module.exports = ListView;
