@@ -1,5 +1,6 @@
 'use strict'
 var DB = require('./db');
+var moment = require('moment');
 
 module.exports = {
     initialize() {
@@ -28,7 +29,49 @@ module.exports = {
             return work(sample);
         });
     },
-    select(query) {
-        return DB.lists.find(query);
+    select(filter) {
+        let query = null;
+        /*
+        let query = {
+            order: {
+                on: 'DESC'
+            }
+        };
+        if (filter == 'today') {
+            var now = moment();
+            query.where = {
+                and: [
+                    {
+                        on: {
+                            eq: now.format('YYYY-MM-DD')
+                        }
+                    }
+                ]
+            };
+        }
+        else if (filter == 'yesterday') {
+            var now = moment().subtract(1, 'days');
+            query.where = {
+                and: [
+                    {
+                        on: {
+                            eq: now.format('YYYY-MM-DD')
+                        }
+                    }
+                ]
+            };
+        }
+        */
+        //console.log(query);
+        return DB.lists.find(query)
+        .then((data) => {
+            if (filter == 'today' || filter == 'yesterday') {
+                let date = (filter == 'yesterday' ? moment().subtract(1, 'days') : moment()).format('YYYY-MM-DD');
+                data = data.filter((v,i) => {
+                    return date == moment(v.on).format('YYYY-MM-DD');
+                });
+            }
+            return data;
+        });
     }
 };

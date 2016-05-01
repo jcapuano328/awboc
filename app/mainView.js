@@ -27,8 +27,20 @@ var MainView = React.createClass({
                 about: {index: 4, name: 'about'}
             },
             version: '',
+            filter: 'today',
             lists: []
         }
+    },
+    fetchLists() {
+        return ListsStore.select(this.state.filter)
+        .then((data) => {
+            console.log('*********** lists');
+            //console.log(data);
+            this.setState({lists: data || []});
+        })
+        .catch((e) => {
+            console.error(e);
+        });
     },
     componentWillMount() {
         console.log('set initial route');
@@ -53,12 +65,7 @@ var MainView = React.createClass({
             return new Promise((accept,reject) => accept());
         })
         .then(() => {
-            return ListsStore.select();
-        })
-        .then((data) => {
-            console.log('*********** lists');
-            //console.log(data);
-            this.setState({lists: data || []});
+            return this.fetchLists();
         })
         .done();
     },
@@ -76,7 +83,7 @@ var MainView = React.createClass({
         this.toggleDrawer();
     },
     navMenuHandler(e) {
-        console.log(e);
+        //console.log(e);
         if (e == 'About') {
             this.refs.navigator.push(this.state.routes.about);
         } else if (e == 'Home') {
@@ -91,20 +98,33 @@ var MainView = React.createClass({
     },
     onFilter(filter) {
         console.log(filter);
+        this.state.filter = filter;
+        this.fetchLists().done();
     },
     onSelected(type, item) {
 
     },
+    filterTitle() {
+        let title = '';
+        if (this.state.filter == 'all') {
+            title = 'All';
+        } else if (this.state.filter == 'today') {
+            title = "Today's";
+        } else if (this.state.filter == 'yesterday') {
+            title = "Yesterday's";
+        }
+        return title + ' Lists';
+    },
     renderScene(route, navigator) {
         route = route || {};
         console.log('render scene ' + route.name);
-        console.log(navigator.getCurrentRoutes().length);
         if (route.name == 'landing') {
             return (
                 <LandingView />
             );
         }
         if (route.name == 'lists') {
+            this.state.routes.lists.title = this.filterTitle();
             return (
                 <View style={{marginTop: 50}}>
                     <ListsView lists={this.state.lists}
