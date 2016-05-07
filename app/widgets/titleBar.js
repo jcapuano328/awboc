@@ -25,11 +25,11 @@ var TitleBar = (props) => {
             );
         },
         Title(route, navigator, index, navState) {
-            route = route || {};
-            //console.log(navState);
+            route = route || {};            
             return (
                 <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
                     <Text style={{
+                          color: 'white',
                           fontSize: 28,
                           fontWeight: 'bold',
                           marginLeft: 10,
@@ -43,11 +43,13 @@ var TitleBar = (props) => {
         },
         RightButton(route, navigator, index, navState) {
             route = route || {};
-            if (!route.onAdd && !route.onFilter) {
+            if (!route.onAdd && !route.onFilter && !route.onAccept && !route.onDiscard) {
               return null;
             }
             return (
                 <View style={{flex: 1, flexDirection: 'row', marginVertical: 10}}>
+                    {route.onAccept ? <IconButton border={true} image={'accept'} onPress={route.onAccept} /> : null}
+                    {route.onDiscard ? <IconButton image={'discard'} onPress={route.onDiscard} /> : null}
                     {route.onAdd ? <IconButton image={'add'} onPress={route.onAdd} /> : null}
                     {route.onFilter ? <FilterMenu image={'filter'} onSelect={route.onFilter} /> : null}
                 </View>

@@ -6,8 +6,28 @@ var IconButton = require('./iconButton');
 var Icons = require('../resources/icons');
 
 var ListItemView = React.createClass({
+    getInitialState() {
+        return {
+            name: this.props.item.name,
+            location: this.props.item.location,
+            status: this.props.item.status,
+            favorite: this.props.item.favorite
+        };
+    },
+    onStatus() {
+        var s = this.state.status == 'open' ? 'complete' : 'open';
+        this.props.item.status = s;
+        this.setState({status: s});
+        this.props.onChanged && this.props.onChanged(this.props.item);
+    },
+    onFavorite() {
+        var f = this.state.favorite ? false : true;
+        this.props.item.favorite = f;
+        this.setState({favorite: f});
+        this.props.onChanged && this.props.onChanged(this.props.item);
+    },
+
     render() {
-        let item = this.props.item;
         return (
             <View style={{
                 alignItems: 'center',
@@ -23,14 +43,15 @@ var ListItemView = React.createClass({
                 borderWidth: 1,
                 borderRadius: 10
             }}>
-                <IconButton image={item.status} onPress={this.props.onStatus}/>
+                <IconButton image={this.state.status} onPress={this.onStatus}/>
                 <TouchableOpacity style={{flex: 2}} onPress={this.props.onSelected}>
                     <View style={{flex: 1}}>
-                        <Text style={{fontSize: 24, fontWeight: 'bold', textAlign: 'left',marginLeft: 20}}>{item.name}</Text>
-                        <Text style={{fontSize: 15,textAlign: 'left',marginLeft: 20}}>{item.location}</Text>
+                        <Text style={{fontSize: 24, fontWeight: 'bold', textAlign: 'left',marginLeft: 20}}>{this.state.name}</Text>
+                        <Text style={{fontSize: 15,textAlign: 'left',marginLeft: 20}}>{this.state.location}</Text>
                     </View>
                 </TouchableOpacity>
                 <IconButton image={'select'} onPress={this.props.onSelected} />
+                <IconButton image={this.state.favorite ? 'favorite' : 'favorite-off'} onPress={this.onFavorite} />
                 <IconButton image={'remove'} onPress={this.props.onRemove} />
             </View>
         );

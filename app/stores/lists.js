@@ -71,7 +71,56 @@ module.exports = {
                     return date == moment(v.on).format('YYYY-MM-DD');
                 });
             }
-            return data;
+            return this.sort(data);
         });
+    },
+    sort(a) {
+        return a.sort((l,r) => {
+            var lon = moment(l.on);
+            var ron = moment(r.on);
+            if (lon.isBefore(ron)) {
+                return 1;
+            } else if (lon.isAfter(ron)) {
+                return -1;
+            } else if (l.name < r.name) {
+                return -1;
+            } else if (l.name > r.name) {
+                return 1;
+            }
+            return 0;
+        });
+    },
+    createNewList(name) {
+        return {
+            "name": name,
+            "location": "",
+            "status": "open",
+            "on": new Date(),
+            "created": new Date(),
+            "modified": null,
+            "items": []
+        };
+    },
+    createNewListItem(name) {
+        return {
+            "name": name,
+            "details": "",
+            "location": "",
+            "status": "open",
+            "created": new Date(),
+            "modified": null
+        };
+    },
+    add(list) {
+        return DB.lists.add(list);
+    },
+    update(list) {
+        return DB.lists.updateById(list, list._id);
+    },
+    remove(list) {
+        if (list._id) {
+            return DB.lists.removeById(list._id);
+        }
+        return new Promise((accept,reject) => accept());
     }
 };

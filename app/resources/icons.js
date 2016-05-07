@@ -13,7 +13,14 @@ module.exports = {
 	"open":	require('./unchecked_checkbox.png'),
 	"complete": require('./checked_checkbox.png'),
 	"select": require('./select.jpg'),
-	"add": require('./add.jpg'),
+	"add": require('./add.png'),
 	"filter": require('./filter.png'),
-	"remove": require('./remove.png')
+	"remove": require('./remove.png'),
+	"favorite": require('./favorite.png'),
+	"favorite-off": require('./favorite-off.png'),
+	"accept": require('./accept.png'),
+	"discard": require('./reject.png'),
+
+	"calendar": require('./calendar.png'),
+	"clock": require('./clock.png')
 };
