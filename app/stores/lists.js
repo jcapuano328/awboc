@@ -17,8 +17,8 @@ module.exports = {
                         i.created = new Date();
                         i.modified = new Date();
                     });
-                    console.log('*********** add list');
-                    console.log(l);
+                    console.log('*********** add list ' + l.name);
+                    //console.log(l);
                     return DB.lists.add(l)
                     .then(() => {
                         return work(a);
@@ -78,7 +78,11 @@ module.exports = {
         return a.sort((l,r) => {
             var lon = moment(l.on);
             var ron = moment(r.on);
-            if (lon.isBefore(ron)) {
+            if (l.status < r.status) {
+                return 1;
+            } else if (l.status > r.status) {
+                return -1;
+            } else if (lon.isBefore(ron)) {
                 return 1;
             } else if (lon.isAfter(ron)) {
                 return -1;

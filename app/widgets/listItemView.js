@@ -4,8 +4,12 @@ var React = require('react-native');
 var { View, TouchableOpacity, Text, Image } = React;
 var IconButton = require('./iconButton');
 var Icons = require('../resources/icons');
+var FavoritesStore = require('../stores/favorites');
+var Subscribable = require('Subscribable');
 
 var ListItemView = React.createClass({
+    mixins: [Subscribable.Mixin],
+
     getInitialState() {
         return {
             name: this.props.item.name,
@@ -14,17 +18,46 @@ var ListItemView = React.createClass({
             favorite: this.props.item.favorite
         };
     },
+    componentDidMount() {
+        this.addListenerOn(this.props.events, 'itemchanged', (item, e) => {
+            if (this.props.item == item && this.state.hasOwnProperty(e.name)) {
+                console.log('^^^^^^^^^^ item ' + item.name + ' property ' + e.name + ' = ' + e.value);
+                let state = {};
+                state[e.name] = e.value;
+                this.setState(state);
+            }
+        });
+    },
     onStatus() {
         var s = this.state.status == 'open' ? 'complete' : 'open';
         this.props.item.status = s;
         this.setState({status: s});
-        this.props.onChanged && this.props.onChanged(this.props.item);
+        this.props.onChanged && this.props.onChanged('status', s);
     },
     onFavorite() {
         var f = this.state.favorite ? false : true;
         this.props.item.favorite = f;
         this.setState({favorite: f});
-        this.props.onChanged && this.props.onChanged(this.props.item);
+        this.props.onChanged && this.props.onChanged('favorite', f);
+        if (f) {
+            console.log('adding favorite ' + this.state.name);
+            FavoritesStore.add(FavoritesStore.createNew(this.state.name, this.state.location))
+            .then(() => {
+                console.log('added favorite ' + this.state.name);
+            })
+            .catch((e) => {
+                console.error(e);
+            });
+        } else {
+            console.log('removing favorite ' + this.state.name);
+            FavoritesStore.removeByKey(this.state.name, this.state.location)
+            .then(() => {
+                console.log('removed favorite ' + this.state.name);
+            })
+            .catch((e) => {
+                console.error(e);
+            });
+        }
     },
 
     render() {

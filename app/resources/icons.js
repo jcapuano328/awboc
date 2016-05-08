@@ -12,7 +12,7 @@ module.exports = {
 
 	"open":	require('./unchecked_checkbox.png'),
 	"complete": require('./checked_checkbox.png'),
-	"select": require('./select.jpg'),
+	"select": require('./select.png'),
 	"add": require('./add.png'),
 	"filter": require('./filter.png'),
 	"remove": require('./remove.png'),

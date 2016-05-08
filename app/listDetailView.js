@@ -35,20 +35,30 @@ var ListDetailView = React.createClass({
         this.setState({status: status});
         this.props.onChanged && this.props.onChanged({name: 'status', value: status});
     },
-    onAdd() {
+    onItemAdd() {
         this.props.onAdd && this.props.onAdd();
     },
-    onRemove(item) {
+    onItemRemove(item) {
         return () => {
-            // remove the item
             this.props.onRemove && this.props.onRemove(item);
         }
     },
+    onItemSelected(item) {
+        return () => {
+            this.props.onSelected && this.props.onSelected(item);
+        }
+    },
     onItemChanged(item) {
-        console.log('item changed ' + item.name);
+        return (f,v) => {
+            console.log('item ' + item.name + ' ' + f + ' = ' + v);
+            var idx = this.state.items.indexOf(item);
+            if (idx > -1) {
+                this.state.items[idx][f] = v;
+            }
+            this.props.onChanged && this.props.onChanged({name: f, value: v});
+        }
     },
     render() {
-        //console.log('render list');
         return (
             <View style={{
                 flex: 1,
@@ -70,7 +80,7 @@ var ListDetailView = React.createClass({
                     }}>
                         <Text style={{color: 'white', fontSize: 22, fontWeight: 'bold', margin: 10}}>Items</Text>
                         <View style={{flex: 1, alignItems: 'flex-end', justifyContent: 'center'}}>
-                            <IconButton image={'add'} onPress={this.onAdd} />
+                            <IconButton image={'add'} onPress={this.onItemAdd} />
                         </View>
                     </View>
                     {this.state.items.length > 0
@@ -81,7 +91,7 @@ var ListDetailView = React.createClass({
                             style={{backgroundColor: 'transparent',flex: 1}}>
                             {this.state.items.map((item, i) => {
                                 return (
-                                    <ListItemView key={i} item={item} onChanged={this.onItemChanged} onRemove={this.onRemove(item)} />
+                                    <ListItemView key={i} item={item} events={this.props.events} onChanged={this.onItemChanged(item)} onSelected={this.onItemSelected(item)} onRemove={this.onItemRemove(item)} />
                                 );
                             })}
                         </ScrollView>

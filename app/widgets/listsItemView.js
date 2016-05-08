@@ -7,8 +7,11 @@ var Icons = require('../resources/icons');
 var moment = require('moment');
 
 var ListsItemView = React.createClass({
+    onStatus() {
+        let s = this.props.list.status == 'open' ? 'complete' : 'open';
+        this.props.onChanged && this.props.onChanged('status', s);
+    },
     render() {
-        let list = this.props.list;
         return (
             <View style={{
                 alignItems: 'center',
@@ -24,10 +27,11 @@ var ListsItemView = React.createClass({
                 borderWidth: 1,
                 borderRadius: 10
             }}>
+                <IconButton image={this.props.list.status} onPress={this.onStatus}/>
                 <TouchableOpacity style={{flex: 2}} onPress={this.props.onSelected}>
                     <View style={{flex: 1}}>
-                        <Text style={{fontSize: 24, fontWeight: 'bold', textAlign: 'left',marginLeft: 20}}>{list.name}</Text>
-                        <Text style={{fontSize: 15,textAlign: 'left',marginLeft: 20}}>{moment(list.on).format('MMM DD, YYYY HH:mm')}</Text>
+                        <Text style={{fontSize: 24, fontWeight: 'bold', textAlign: 'left',marginLeft: 20}}>{this.props.list.name}</Text>
+                        <Text style={{fontSize: 15,textAlign: 'left',marginLeft: 20}}>{moment(this.props.list.on).format('MMM DD, YYYY HH:mm')}</Text>
                     </View>
                 </TouchableOpacity>
                 <IconButton image={'select'} onPress={this.props.onSelected} />

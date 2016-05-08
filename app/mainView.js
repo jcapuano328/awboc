@@ -13,7 +13,8 @@ var ListItemDetailView = require('./listItemDetailView');
 var AboutView = require('./aboutView');
 var SystemStore = require('./stores/system');
 var ListsStore = require('./stores/lists');
-var title = 'Aw? Boc!';
+var EventEmitter = require('EventEmitter');
+//var title = 'Aw? Boc!';
 
 var MainView = React.createClass({
     getInitialState() {
@@ -23,7 +24,7 @@ var MainView = React.createClass({
                 landing: {index: 0, name: 'landing', onMenu: this.navMenuHandler},
                 lists: {index: 1, name: 'lists', title: 'Lists', onMenu: this.navMenuHandler, onAdd: this.onAdd, onFilter: this.onFilter},
                 list: {index: 2, name: 'list', title: 'List', onMenu: this.navMenuHandler, onAccept: this.onAccept('list'), onDiscard: this.onDiscard('list')},
-                item: {index: 3, name: 'item', title: 'Item', onMenu: this.navMenuHandler},
+                item: {index: 3, name: 'item', title: 'Item', onMenu: this.navMenuHandler, onAccept: this.onAccept('item'), onDiscard: this.onDiscard('item')},
                 about: {index: 4, name: 'about'}
             },
             version: '',
@@ -36,7 +37,7 @@ var MainView = React.createClass({
     fetchLists() {
         return ListsStore.select(this.state.filter)
         .then((data) => {
-            console.log('*********** lists');
+            //console.log('*********** lists');
             //console.log(data);
             this.setState({lists: data || []});
             return data;
@@ -47,6 +48,7 @@ var MainView = React.createClass({
     },
     componentWillMount() {
         //console.log('set initial route');
+        this.eventEmitter = new EventEmitter();
         this.state.initialRoute = this.state.routes.landing;
         SystemStore.get()
         .then((data) => {
@@ -114,13 +116,13 @@ var MainView = React.createClass({
         this.refs.navigator.push(this.state.routes.list);
     },
     onFilter(filter) {
-        console.log(filter);
+        console.log('filter ' + filter);
         this.state.filter = filter;
         this.fetchLists().done();
     },
     onAccept(type) {
         return () => {
-            console.log('accept');
+            console.log('accept ' + type);
             if (type == 'list' && this.state.selectedList) {
                 if (this.state.lists.indexOf(this.state.selectedList) < 0) {
                     console.log('adding new list');
@@ -144,18 +146,41 @@ var MainView = React.createClass({
                 }
                 this.setState({lists: ListsStore.sort(this.state.lists), selectedList: null});
             } else if (type == 'item' && this.state.selectedItem) {
-
+                if (this.state.selectedList) {
+                    var idx = this.state.selectedList.items.indexOf(this.state.selectedItem);
+                    if (idx < 0) {
+                        console.log('adding new item to list');
+                        this.state.selectedList.items.push(this.state.selectedItem);
+                    } else {
+                        console.log('updating existing item in list');
+                        //console.log(this.state.selectedItem);
+                        this.state.selectedList.items[idx] = this.state.selectedItem;
+                    }
+                    /* don't save; let the master list do it...
+                    ListsStore.update(this.state.selectedList)
+                    .then(() => {
+                        console.log('list updated');
+                    })
+                    .catch((e) => {
+                        console.error(e);
+                    });
+                    */
+                    Object.keys(this.state.selectedItem).forEach((k) => {
+                        this.eventEmitter.emit('itemchanged', this.state.selectedItem, {name: k, value: this.state.selectedItem[k]});
+                    });
+                    this.setState({lists: this.state.lists, selectedList: this.state.selectedList, selectedItem: null});
+                }
             }
             this.refs.navigator.pop();
         }
     },
     onDiscard(type) {
         return () => {
-            console.log('discard');
+            console.log('discard ' + type);
             if (type == 'list' && this.state.selectedList) {
                 this.setState({selectedList: null});
             } else if (type == 'item' && this.state.selectedItem) {
-
+                this.setState({selectedItem: null});
             }
             this.refs.navigator.pop();
         }
@@ -176,19 +201,37 @@ var MainView = React.createClass({
         //console.log('render scene ' + route.name);
         if (route.name == 'landing') {
             return (
-                <LandingView />
+                <LandingView events={this.eventEmitter} />
             );
         }
         if (route.name == 'lists') {
             this.state.routes.lists.title = this.filterTitle();
             return (
                 <View style={{marginTop: 50}}>
-                    <ListsView lists={this.state.lists}
+                    <ListsView lists={this.state.lists} events={this.eventEmitter}
                         onSelected={(e) => {
                             console.log('*********** selected list ' + e.name);
                             this.state.routes.list.title = e.name;
                             this.setState({selectedList: e});
                             navigator.push(this.state.routes.list);
+                        }}
+                        onChanged={(list, e) => {
+                            console.log('*********** modified list ' + list.name + ' ' + e.name + ' = ' + e.value);
+                            var idx = this.state.lists.indexOf(list);
+                            if (idx > -1) {
+                                this.state.lists[idx][e.name] = e.value;
+                                if (e.name == 'name') {
+                                    this.state.routes.list.title = e.value;
+                                }
+                                ListsStore.update(list)
+                                .then(() => {
+                                    console.log('list updated');
+                                })
+                                .catch((ex) => {
+                                    console.error(ex);
+                                });
+                                this.setState({lists: ListsStore.sort(this.state.lists)});
+                            }
                         }}
                         onRemove={(e) => {
                             Alert.alert('Remove List ' + e.name + '?', 'The list and all of its items will be permanently removed', [
@@ -218,17 +261,16 @@ var MainView = React.createClass({
         if (route.name == 'list') {
             return (
                 <View style={{marginTop: 50}}>
-                    <ListDetailView list={this.state.selectedList}
+                    <ListDetailView list={this.state.selectedList} events={this.eventEmitter}
                         onSelected={(e) => {
-                            console.log('*********** selected');
-                            console.log(e.name);
+                            console.log('*********** selected item ' + e.name);
+                            console.log();
                             this.state.selectedItem = e;
                             this.state.routes.item.title = e.name;
                             navigator.push(this.state.routes.item);
                         }}
                         onChanged={(e) => {
-                            console.log('*********** modified list');
-                            console.log(e.name + ' = ' + e.value);
+                            console.log('*********** modified list ' + e.name + ' = ' + e.value);
                             if (this.state.selectedList) {
                                 this.state.selectedList[e.name] = e.value;
                                 if (e.name == 'name') {
@@ -244,19 +286,24 @@ var MainView = React.createClass({
                             navigator.push(this.state.routes.item);
                         }}
                         onRemove={(e) => {
-                            console.log('*********** remove item ' + e.name + ' from list');
-                            var idx = this.state.selectedList.items.indexOf(this.state.selectedItem);
-                            if (idx > -1) {
-                                this.state.selectedList.items.splice(idx, 1);
-                            }
-                            this.setState({lists: this.state.lists, selectedItem: null});
-                            ListsStore.update(this.state.selectedList)
-                            .then(() => {
-                                console.log('list item removed');
-                            })
-                            .catch((ex) => {
-                                console.error(ex);
-                            });
+                            Alert.alert('Remove Item ' + e.name + ' from List ' + this.state.selectedList.name + '?', 'The item will be permanently removed', [
+                                {text: 'No', style: 'cancel'},
+                                {text: 'Yes', onPress: () => {
+                                    console.log('*********** remove item ' + e.name + ' from list ' + this.state.selectedList.name);
+                                    var idx = this.state.selectedList.items.indexOf(e);
+                                    if (idx > -1) {
+                                        this.state.selectedList.items.splice(idx, 1);
+                                        this.setState({lists: this.state.lists, selectedItem: null});
+                                        ListsStore.update(this.state.selectedList)
+                                        .then(() => {
+                                            console.log('list item removed');
+                                        })
+                                        .catch((ex) => {
+                                            console.error(ex);
+                                        });
+                                    }
+                                }}
+                            ]);
                         }}
                     />
                 </View>
@@ -266,14 +313,16 @@ var MainView = React.createClass({
         if (route.name == 'item') {
             return (
                 <View style={{marginTop: 50}}>
-                    <ListItemDetailView item={this.state.selectedItem}
-                        onOk={(e) => {
-                            console.log('*********** accept changes');
-                            console.log(e.name);
-                        }}
-                        onCancel={(e) => {
-                            console.log('*********** discard changes');
-                            console.log(e.name);
+                    <ListItemDetailView item={this.state.selectedItem} events={this.eventEmitter}
+                        onChanged={(e) => {
+                            console.log('*********** modified list item ' + e.name + ' = ' + e.value);
+                            if (this.state.selectedItem) {
+                                this.state.selectedItem[e.name] = e.value;
+                                if (e.name == 'name') {
+                                    this.state.routes.item.title = e.value;
+                                }
+                                this.setState({selectedItem: this.state.selectedItem});
+                            }
                         }}
                     />
                 </View>
@@ -282,7 +331,7 @@ var MainView = React.createClass({
 
         if (route.name == 'about') {
             return (
-                <AboutView version={this.state.version} onClose={() => {navigator.pop();}} />
+                <AboutView version={this.state.version} events={this.eventEmitter} onClose={() => {navigator.pop();}} />
             );
         }
         return (

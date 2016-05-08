@@ -18,5 +18,11 @@ awboc: {
                 }
             ]
         }
+    ],
+    favorites: [
+        {
+            name: string,
+            location: string
+        }
     ]
 }
