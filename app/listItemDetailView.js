@@ -19,27 +19,24 @@ var ListItemDetailView = React.createClass({
     onChangeName(v) {
         this.setState({name: v});
         this.props.onChanged && this.props.onChanged({name: 'name', value: v});
-        //this.raiseChanged({name: 'name', value: v});
     },
     onChangeLocation(v) {
         this.setState({location: v});
         this.props.onChanged && this.props.onChanged({name: 'location', value: v});
-        //this.raiseChanged({name: 'location', value: v});
     },
     onChangeDetails(v) {
         this.setState({details: v});
         this.props.onChanged && this.props.onChanged({name: 'details', value: v});
-        //this.raiseChanged({name: 'details', value: v});
     },
     onStatusChanged(v) {
         let status = v ? 'complete' : 'open';
         this.setState({status: status});
         this.props.onChanged && this.props.onChanged({name: 'status', value: status});
-        //this.raiseChanged({name: 'status', value: status});
     },
-    /*raiseChanged(e) {
-        this.props.events && this.props.events.emit('itemchanged', this.props.item, e);
-    },*/
+    onFavoriteChanged(v) {
+        this.setState({favorite: v});
+        this.props.onChanged && this.props.onChanged({name: 'favorite', value: v});
+    },
     render() {
         return (
             <View style={{
@@ -52,9 +49,19 @@ var ListItemDetailView = React.createClass({
                     <TextInput style={{flex: 1, margin: 10, fontSize: 20}} placeholder={'Location'} onChangeText={this.onChangeLocation}>{this.state.location}</TextInput>
                 </View>
                 <TextInput style={{flex: 1, margin: 10, fontSize: 20}} placeholder={'Details'} multiline={true} onChangeText={this.onChangeDetails}>{this.state.details}</TextInput>
-                <View style={{flex: 1, alignItems: 'center'}}>
-                    <Text>Complete</Text>
-                    <Switch value={this.state.status == 'complete'} onValueChange={this.onStatusChanged} />
+                <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+                    <View style={{flex: 1, flexDirection: 'row'}}>
+                        <Text style={{flex: 1, textAlign: 'right'}}>Favorite</Text>
+                        <View style={{flex: 1, alignItems: 'flex-start', marginLeft: 10}} >
+                            <Switch value={!!this.state.favorite} onValueChange={this.onFavoriteChanged} />
+                        </View>
+                    </View>
+                    <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+                        <Text style={{flex: 1, textAlign: 'right'}}>Complete</Text>
+                        <View style={{flex: 1, alignItems: 'flex-start', marginLeft: 10}} >
+                            <Switch value={this.state.status == 'complete'} onValueChange={this.onStatusChanged} />
+                        </View>
+                    </View>
                 </View>
                 {this.state.modified ? <Text>modified {moment(this.state.modified).format('MMM DD, YYYY HH:mm')}</Text> : null}
             </View>
