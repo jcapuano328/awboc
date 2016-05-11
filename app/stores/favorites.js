@@ -50,6 +50,12 @@ module.exports = {
             return true;
         });
     },
+    remove(favorite) {
+        if (favorite._id) {
+            return DB.favorites.removeById(favorite._id);
+        }
+        return new Promise((accept,reject) => accept());
+    },
     removeByKey(name, location) {
         let query = {
             where: {

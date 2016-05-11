@@ -10,6 +10,7 @@ var LandingView = require('./landingView');
 var ListsView = require('./listsView');
 var ListDetailView = require('./listDetailView');
 var ListItemDetailView = require('./listItemDetailView');
+var FavoritesView = require('./favoritesView');
 var AboutView = require('./aboutView');
 var SystemStore = require('./stores/system');
 var ListsStore = require('./stores/lists');
@@ -25,7 +26,8 @@ var MainView = React.createClass({
                 lists: {index: 1, name: 'lists', title: 'Lists', onMenu: this.navMenuHandler, onAdd: this.onAdd, onFilter: this.onFilter},
                 list: {index: 2, name: 'list', title: 'List', onMenu: this.navMenuHandler, onAccept: this.onAccept('list'), onDiscard: this.onDiscard('list')},
                 item: {index: 3, name: 'item', title: 'Item', onMenu: this.navMenuHandler, onAccept: this.onAccept('item'), onDiscard: this.onDiscard('item')},
-                about: {index: 4, name: 'about'}
+                favorites: {index: 4, name: 'favorites', title: 'Favorites', onMenu: this.navMenuHandler, onDiscard: this.onDiscard('favorite')},
+                about: {index: 5, name: 'about'}
             },
             version: '',
             filter: 'all',//'today',
@@ -257,7 +259,6 @@ var MainView = React.createClass({
                 </View>
             );
         }
-
         if (route.name == 'list') {
             return (
                 <View style={{marginTop: 50}}>
@@ -309,11 +310,11 @@ var MainView = React.createClass({
                 </View>
             );
         }
-
         if (route.name == 'item') {
             return (
                 <View style={{marginTop: 50}}>
                     <ListItemDetailView item={this.state.selectedItem} events={this.eventEmitter}
+                        onFavorites={(e) => navigator.push(this.state.routes.favorites) }
                         onChanged={(e) => {
                             console.log('*********** modified list item ' + e.name + ' = ' + e.value);
                             if (this.state.selectedItem) {
@@ -328,7 +329,19 @@ var MainView = React.createClass({
                 </View>
             );
         }
-
+        if (route.name == 'favorites') {
+            return (
+                <View style={{marginTop: 50}}>
+                    <FavoritesView
+                        onSelected={(e) => {
+                            console.log('*********** selected favorite ' + e.name);                            
+                            this.eventEmitter.emit('favorite', e);
+                            this.refs.navigator.pop();
+                        }}
+                    />
+                </View>
+            );
+        }
         if (route.name == 'about') {
             return (
                 <AboutView version={this.state.version} events={this.eventEmitter} onClose={() => {navigator.pop();}} />

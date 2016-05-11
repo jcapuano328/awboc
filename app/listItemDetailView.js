@@ -2,10 +2,13 @@
 
 var React = require('react-native');
 var { View, Switch, Text, TextInput } = React;
-var Button = require('apsl-react-native-button');
+var IconButton = require('./widgets/iconButton');
+var Subscribable = require('Subscribable');
 var moment = require('moment');
 
 var ListItemDetailView = React.createClass({
+    mixins: [Subscribable.Mixin],
+
     getInitialState() {
         return {
             name: this.props.item.name,
@@ -15,6 +18,13 @@ var ListItemDetailView = React.createClass({
             created: this.props.item.created,
             modified: this.props.item.modified
         };
+    },
+    componentDidMount() {
+        this.addListenerOn(this.props.events, 'favorite', (e) => {
+            console.log('use favorite selection');
+            this.onChangeName(e.name);
+            this.onChangeLocation(e.location);
+        });
     },
     onChangeName(v) {
         this.setState({name: v});
@@ -44,8 +54,9 @@ var ListItemDetailView = React.createClass({
                 //marginTop: 30,
                 //backgroundColor: 'rgba(0,0,0,0.01)',
             }}>
-                <View style={{flex: 1, flexDirection: 'row'}}>
+                <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
                     <TextInput style={{flex: 1, margin: 10, fontSize: 20}} placeholder={'Description'} onChangeText={this.onChangeName}>{this.state.name}</TextInput>
+                    <IconButton style={{flex: 1}} image={'favorite'} onPress={this.props.onFavorites}/>
                     <TextInput style={{flex: 1, margin: 10, fontSize: 20}} placeholder={'Location'} onChangeText={this.onChangeLocation}>{this.state.location}</TextInput>
                 </View>
                 <TextInput style={{flex: 1, margin: 10, fontSize: 20}} placeholder={'Details'} multiline={true} onChangeText={this.onChangeDetails}>{this.state.details}</TextInput>
