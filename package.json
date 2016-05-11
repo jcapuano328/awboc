@@ -9,7 +9,8 @@
     "install-rel": "adb install -r android/app/build/outputs/apk/awboc-release-1.0.apk",
     "bridge": "adb reverse tcp:8081 tcp:8081",
     "menu": "adb shell input keyevent 82",
-    "logs": "adb logcat *:S ReactNative:V ReactNativeJS:V"
+    "logs": "adb logcat *:S ReactNative:V ReactNativeJS:V",
+    "generate-key": " keytool -genkey -v -keystore awboc.keystore -alias awboc -keyalg RSA -keysize 2048 -validity 10000"
   },
   "dependencies": {
     "apsl-react-native-button": "^2.4.2",
